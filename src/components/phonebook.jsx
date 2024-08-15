@@ -1,24 +1,26 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 
-const users = [
-   { firstName: "John", id: 1 },
-   { firstName: "Emily", id: 2 },
-   { firstName: "Michael", id: 3 },
-   { firstName: "Sarah", id: 4 },
-   { firstName: "David", id: 5 },
-   { firstName: "Jessica", id: 6 },
-   { firstName: "Daniel", id: 7 },
-   { firstName: "Olivia", id: 8 },
-   { firstName: "Matthew", id: 9 },
-   { firstName: "Sophia", id: 10 }
- ]
 
  function ListofPeople() {
-   const [searchItem, setsearchItem] = useState('');
-   
+   const [filteredInput, setfilteredInput] = useState([]);
+   const [apiUsers, setApiUsers] = useState('');
+
+
+   useEffect(() => {
+      fetch('https://dummyjson.com/users')
+        .then(response => response.json())
+      
+        .then(data => {
+         setApiUsers(data.users);
+         setfilteredInput(data.users)
+        }
+      ) 
+        .catch(err => console.log(err))
+    }, [])
 
    const handleInputChange = (e) => {
-      setsearchItem(e.target.value);
+     const filtereditems = apiUsers.filter((user) => user.firstName.toLocaleLowerCase().includes(e.target.value.toLocaleLowerCase()));
+     setfilteredInput(filtereditems);
    }
 
 return (
@@ -26,14 +28,18 @@ return (
       <h1>Siema</h1>
       <input
         type="text"
-        value={searchItem}
         onChange={handleInputChange}
         placeholder='Type to search'
       />
       <div>
-         <ul>
-            {users.map((user) => <li key= {user.id}>{user.firstName}</li>)}
-         </ul>
+
+         {filteredInput.length === 0
+         ? <p>No items</p>
+         :  <ul>
+         {filteredInput.map((user) => <li key= {user.id}>{user.firstName}</li>)}
+      </ul>
+         }
+        
       </div>
    </div>
 )
